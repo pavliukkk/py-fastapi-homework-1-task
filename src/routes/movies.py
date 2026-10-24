@@ -7,8 +7,8 @@ import schemas
 from src.database.session import get_db
 from src.database.models import MovieModel
 
-
 router = APIRouter()
+
 
 @router.get("/movies/{movie_id}/", response_model=schemas.movies.MovieDetailResponseSchema)
 async def get_film(movie_id: int, db: AsyncSession = Depends(get_db)):
@@ -20,7 +20,12 @@ async def get_film(movie_id: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/movies/", response_model=schemas.movies.MovieListResponseSchema)
-async def get_film(request: Request, page: int = Query(default=1, ge=1), per_page: int = Query(default=10, ge=1, le=20), db: AsyncSession = Depends(get_db)):
+async def get_film_by_id(
+        request: Request,
+        page: int = Query(default=1, ge=1),
+        per_page: int = Query(default=10, ge=1, le=20),
+        db: AsyncSession = Depends(get_db)
+):
     total_items = await db.scalar(select(func.count()).select_from(MovieModel))
     total_items = total_items or 0
 
