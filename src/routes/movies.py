@@ -11,7 +11,10 @@ router = APIRouter()
 
 
 @router.get("/movies/{movie_id}/", response_model=schemas.movies.MovieDetailResponseSchema)
-async def get_film(movie_id: int, db: AsyncSession = Depends(get_db)):
+async def get_film_by_id(
+        movie_id: int,
+        db: AsyncSession = Depends(get_db)
+) -> MovieModel:
     result = await db.execute(select(MovieModel).where(MovieModel.id == movie_id))
     movie = result.scalar_one_or_none()
     if not movie:
@@ -20,12 +23,12 @@ async def get_film(movie_id: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.get("/movies/", response_model=schemas.movies.MovieListResponseSchema)
-async def get_film_by_id(
+async def get_film(
         request: Request,
         page: int = Query(default=1, ge=1),
         per_page: int = Query(default=10, ge=1, le=20),
         db: AsyncSession = Depends(get_db)
-):
+) -> list[MovieModel]:
     total_items = await db.scalar(select(func.count()).select_from(MovieModel))
     total_items = total_items or 0
 
